@@ -20,6 +20,9 @@ class GameScene: SKScene {
     
     let victory = SKLabelNode(text: "VICTORY ACHIEVED")
     
+    var points: Int = 0
+    let pointsLabel = SKLabelNode(fontNamed: "Helvetica")
+
     override func didMove(to view: SKView) {
         
         physicsWorld.contactDelegate = self
@@ -30,6 +33,31 @@ class GameScene: SKScene {
         
         addChild(lockTop)
         addChild(lockBase)
+        
+        setupPointsLabel()
+    }
+    
+    func setupPointsLabel() {
+        pointsLabel.fontSize = 40
+        pointsLabel.fontColor = SKColor.white // Set font color to white for visibility against black background
+        pointsLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 200) // Position at the top center of the screen
+        pointsLabel.zPosition = 100  // Ensure the label is on top of other nodes
+        pointsLabel.text = "Points: \(points)"
+        addChild(pointsLabel)
+        print("Points label added to the scene at position: \(pointsLabel.position)")
+    }
+    
+    func updatePoints() {
+        points += 1
+        pointsLabel.text = "Points: \(points)"
+        print("Points updated to: \(points)")
+    }
+    
+    func spawnCollectible() {
+        let newCollectible = Collectible()
+        lockBase.addChild(newCollectible)
+        collectible = newCollectible
+        updatePoints()
     }
     
     func touchDown(atPoint pos : CGPoint) {
@@ -61,12 +89,6 @@ class GameScene: SKScene {
         default:
             player.zRotation += 0.03 * player.velocity
         }
-    }
-    
-    func spawnCollectible() {
-        let newCollectible = Collectible()
-        lockBase.addChild(newCollectible)
-        collectible = newCollectible
     }
 }
 
@@ -109,3 +131,4 @@ extension GameScene {
         })
     }
 }
+

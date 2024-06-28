@@ -23,10 +23,7 @@ class LabelBackground: SKNode {
         bg.size = CGSize(width: 200, height: 200)  // Adjust size as needed
         bg.zPosition = 1
         
-
-        
         super.init()
-        
         addChild(bg)
     }
     

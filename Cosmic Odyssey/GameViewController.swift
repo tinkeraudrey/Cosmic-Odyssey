@@ -1,9 +1,12 @@
 //
-//  GameViewController.swift
-//  Cosmic Odyssey
 //
-//  Created by Audrey Lucas on 6/27/24.
 //
+// Created by Swift Goose.
+// Copyright (c) 2022 Swift Goose. All rights reserved.
+//
+// YouTube: https://www.youtube.com/channel/UCeHYBwcVqOoyyNHiAf3ZrLg
+//
+
 
 import UIKit
 import SpriteKit
@@ -25,10 +28,14 @@ class GameViewController: UIViewController {
             }
             
             view.ignoresSiblingOrder = true
-            
+            view.showsPhysics = true
             view.showsFPS = true
             view.showsNodeCount = true
         }
+    }
+
+    override var shouldAutorotate: Bool {
+        return true
     }
 
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {

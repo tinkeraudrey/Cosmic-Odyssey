@@ -32,7 +32,6 @@ class GameScene: SKScene {
     var collectibleTouched = false // Flag to track if collectible was touched
     
     override func didMove(to view: SKView) {
-        
         physicsWorld.contactDelegate = self
         
         lockBase.addChild(labelBg)
@@ -44,7 +43,11 @@ class GameScene: SKScene {
         
         setupLabels()
         setupGameOverScreen()
+        setupAchievementsButton()
+        
+        GameAchievements.loadAchievements() // Load achievements
     }
+
     
     func setupLabels() {
         pointsLabel.fontSize = 40
@@ -98,6 +101,8 @@ class GameScene: SKScene {
         
         player.rotationSpeed += 0.01 // Increase player rotation speed slightly
         print("Player rotation speed increased to: \(player.rotationSpeed)")
+        
+        GameAchievements.checkAchievements(points: points) // Check achievements
     }
     
     func spawnCollectible() {
@@ -117,23 +122,34 @@ class GameScene: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if isGameOver {
-            for t in touches {
-                let location = t.location(in: self)
+        for t in touches {
+            let location = t.location(in: self)
+            let node = self.atPoint(location)
+            
+            if node.name == "achievementsButton" {
+                let transition = SKTransition.fade(withDuration: 0.5)
+                let achievementsScene = AchievementsScene(size: size)
+                achievementsScene.scaleMode = .aspectFill
+                view?.presentScene(achievementsScene, transition: transition)
+                return
+            }
+            
+            if isGameOver {
                 if continueButton.contains(location) {
                     resetGame()
                 }
-            }
-        } else {
-            collectibleTouched = false // Reset the flag for each new touch
-            for t in touches { self.touchDown(atPoint: t.location(in: self)) }
-            
-            // If the collectible was not touched, end the game
-            if !collectibleTouched {
-                gameOver()
+            } else {
+                collectibleTouched = false // Reset the flag for each new touch
+                touchDown(atPoint: location)
+                
+                // If the collectible was not touched, end the game
+                if !collectibleTouched {
+                    gameOver()
+                }
             }
         }
     }
+
     
     override func update(_ currentTime: TimeInterval) {
         if isGameOver { return }
@@ -211,4 +227,15 @@ extension GameScene {
         
         spawnCollectible()
     }
+    
+    func setupAchievementsButton() {
+        let achievementsButton = SKLabelNode(fontNamed: "Helvetica")
+        achievementsButton.text = "Achievements"
+        achievementsButton.fontSize = 40
+        achievementsButton.fontColor = SKColor.white
+        achievementsButton.position = CGPoint(x: frame.midX, y: frame.maxY - 300)
+        achievementsButton.name = "achievementsButton"
+        addChild(achievementsButton)
+    }
+
 }

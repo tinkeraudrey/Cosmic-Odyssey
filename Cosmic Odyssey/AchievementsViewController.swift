@@ -1,29 +1,40 @@
-//
-//  AchievementsViewController.swift
-//  Cosmic Odyssey
-//
-//  Created by Audrey Lucas on 6/29/24.
-//
-
 import UIKit
 
 class AchievementsViewController: UIViewController {
+    var achievements: [GameAchievement] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        view.backgroundColor = .black
+
+        let titleLabel = UILabel()
+        titleLabel.text = "Achievements"
+        titleLabel.textColor = .white
+        titleLabel.font = UIFont.systemFont(ofSize: 24)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(titleLabel)
+
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.spacing = 10
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(stackView)
+
+        for achievement in achievements {
+            let label = UILabel()
+            label.text = "\(achievement.title): \(achievement.description) - \(achievement.isUnlocked ? "Unlocked" : "Locked")"
+            label.textColor = .white
+            stackView.addArrangedSubview(label)
+        }
+
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            stackView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
+            stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

@@ -1,12 +1,19 @@
 import SpriteKit
 
+enum CollisionType: UInt32 {
+    case player = 1
+    case collectible = 2
+}
+
 class Player: SKNode {
     
     let ticker: SKSpriteNode!
     var ready = false
     var velocity = CGFloat(-1)
+    var rotationSpeed = CGFloat(0.03) // Renamed to rotationSpeed
     
     override init() {
+        
         let texture = SKTexture(imageNamed: "Lock_Player")
         ticker = SKSpriteNode(texture: texture, color: .white, size: texture.size())
         
@@ -19,9 +26,10 @@ class Player: SKNode {
         ticker.physicsBody?.isDynamic = true
         ticker.physicsBody?.allowsRotation = false
         ticker.physicsBody?.affectedByGravity = false
-    
+        ticker.physicsBody?.categoryBitMask = CollisionType.player.rawValue
         ticker.physicsBody?.collisionBitMask = 0
-
+        ticker.physicsBody?.contactTestBitMask = CollisionType.collectible.rawValue
+        
         super.init()
         
         addChild(ticker)
@@ -31,4 +39,3 @@ class Player: SKNode {
         fatalError("init(coder:) has not been implemented")
     }
 }
-

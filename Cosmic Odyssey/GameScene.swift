@@ -95,6 +95,9 @@ class GameScene: SKScene {
             UserDefaults.standard.set(highScore, forKey: "highScore")
             print("New high score: \(highScore)")
         }
+        
+        player.rotationSpeed += 0.01 // Increase player rotation speed slightly
+        print("Player rotation speed increased to: \(player.rotationSpeed)")
     }
     
     func spawnCollectible() {
@@ -135,22 +138,7 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         if isGameOver { return }
         
-        switch currentLevel {
-        case 1...4:
-            player.zRotation += 0.03 * player.velocity
-            
-        case 5...9:
-            player.zRotation += 0.04 * player.velocity
-            
-        case 10...14:
-            player.zRotation += 0.05 * player.velocity
-            
-        case 15...20:
-            player.zRotation += 0.06 * player.velocity
-            
-        default:
-            player.zRotation += 0.03 * player.velocity
-        }
+        player.zRotation += player.rotationSpeed * player.velocity
     }
 }
 
@@ -218,6 +206,7 @@ extension GameScene {
         pointsLabel.text = "Points: \(points)"
         remainingCollectibles = 1
         player.velocity = 1
+        player.rotationSpeed = 0.03 // Reset player rotation speed to initial value
         player.ready = false
         
         spawnCollectible()

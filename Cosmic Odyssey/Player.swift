@@ -1,13 +1,3 @@
-//
-//
-//
-// Created by Swift Goose.
-// Copyright (c) 2022 Swift Goose. All rights reserved.
-//
-// YouTube: https://www.youtube.com/channel/UCeHYBwcVqOoyyNHiAf3ZrLg
-//
-
-
 import SpriteKit
 
 enum CollisionType: UInt32 {
@@ -20,6 +10,7 @@ class Player: SKNode {
     let ticker: SKSpriteNode!
     var ready = false
     var velocity = CGFloat(-1)
+    var rotationSpeed = CGFloat(0.03) // Renamed to rotationSpeed
     
     override init() {
         
@@ -48,3 +39,4 @@ class Player: SKNode {
         fatalError("init(coder:) has not been implemented")
     }
 }
+

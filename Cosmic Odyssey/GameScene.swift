@@ -5,13 +5,19 @@ class GameAchievement {
     var title: String
     var description: String
     var isUnlocked: Bool
+    var progress: Int
+    var goal: Int
 
-    init(title: String, description: String, isUnlocked: Bool) {
+    init(title: String, description: String, isUnlocked: Bool, progress: Int, goal: Int) {
         self.title = title
         self.description = description
         self.isUnlocked = isUnlocked
+        self.progress = progress
+        self.goal = goal
     }
 }
+
+
 
 class GameScene: SKScene {
     
@@ -146,6 +152,12 @@ class GameScene: SKScene {
         }
     }
     
+    func showAchievements() {
+        let achievementsViewController = AchievementsViewController()
+        achievementsViewController.achievements = setupAchievements()  // Ensure you have achievements set up
+        view?.window?.rootViewController?.present(achievementsViewController, animated: true, completion: nil)
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let location = touch.location(in: self)
@@ -153,6 +165,7 @@ class GameScene: SKScene {
             // Check if the achievements button is touched
             if achievementsButton.contains(location) {
                 showAchievements()
+
                 return  // Exit the method early to avoid further processing
             }
             
@@ -172,13 +185,18 @@ class GameScene: SKScene {
         }
     }
 
-    
-    func showAchievements() {
-        let viewController = AchievementsViewController()
-        viewController.achievements = [
-            GameAchievement(title: "Collector", description: "Collect 10 collectibles", isUnlocked: points >= 10)
-        ]
-        view?.window?.rootViewController?.present(viewController, animated: true, completion: nil)
+    func setupAchievements() -> [GameAchievement] {
+        var achievements: [GameAchievement] = []
+
+        // Example achievements
+        achievements.append(GameAchievement(title: "Novice Collector:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
+        achievements.append(GameAchievement(title: "Star Collector:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
+        achievements.append(GameAchievement(title: "Galactic Hoarder:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
+        achievements.append(GameAchievement(title: "Cosmic Gatherer:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
+        achievements.append(GameAchievement(title: "Interstellar Collector:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
+        achievements.append(GameAchievement(title: "Universal Archivist:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
+        
+        return achievements
     }
 
     

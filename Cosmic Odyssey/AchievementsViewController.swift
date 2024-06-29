@@ -23,10 +23,16 @@ class AchievementsViewController: UIViewController {
         view.addSubview(stackView)
 
         for achievement in achievements {
-            let label = UILabel()
-            label.text = "\(achievement.title): \(achievement.description) - \(achievement.isUnlocked ? "Unlocked" : "Locked")"
-            label.textColor = .white
-            stackView.addArrangedSubview(label)
+            let achievementLabel = UILabel()
+            achievementLabel.numberOfLines = 0 // Allow multiple lines
+            achievementLabel.text = "\(achievement.title)\n\(achievement.description) - \(achievement.isUnlocked ? "Unlocked" : "Locked")"
+            achievementLabel.textColor = .white
+            stackView.addArrangedSubview(achievementLabel)
+
+            // Create progress view
+            let progressView = UIProgressView(progressViewStyle: .default)
+            progressView.progress = Float(achievement.progress) / Float(achievement.goal)
+            stackView.addArrangedSubview(progressView)
         }
 
         NSLayoutConstraint.activate([

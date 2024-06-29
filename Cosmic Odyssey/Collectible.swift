@@ -31,9 +31,8 @@ class Collectible: SKSpriteNode {
         physicsBody?.isDynamic = false
         physicsBody?.allowsRotation = false
         physicsBody?.affectedByGravity = false
-        physicsBody?.categoryBitMask = CollisionType.collectible.rawValue
         physicsBody?.collisionBitMask = 0
-        physicsBody?.contactTestBitMask = CollisionType.player.rawValue
+ 
         
         setRandomPosition()
     }

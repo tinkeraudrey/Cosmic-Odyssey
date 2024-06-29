@@ -1,54 +1,53 @@
 import SpriteKit
 
 class AchievementsScene: SKScene {
+    var achievementsLabels: [SKLabelNode] = []
+    var backButton: SKLabelNode!
     
     override func didMove(to view: SKView) {
-        backgroundColor = .black
+        backgroundColor = SKColor.black
         
-        let titleLabel = SKLabelNode(fontNamed: "Helvetica")
-        titleLabel.text = "Achievements"
-        titleLabel.fontSize = 50
-        titleLabel.fontColor = SKColor.white
-        titleLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 100)
-        addChild(titleLabel)
-        
-        setupAchievements()
+        setupAchievementsLabels()
         setupBackButton()
     }
     
-    func setupAchievements() {
+    func setupAchievementsLabels() {
         for (index, achievement) in GameAchievements.achievements.enumerated() {
-            let achievementLabel = SKLabelNode(fontNamed: "Helvetica")
-            achievementLabel.text = "\(achievement.name): \(achievement.description)"
-            achievementLabel.fontSize = 30
-            achievementLabel.fontColor = achievement.isUnlocked ? SKColor.green : SKColor.red
-            achievementLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 150 - CGFloat(index * 50))
-            addChild(achievementLabel)
+            let label = SKLabelNode(fontNamed: "Helvetica")
+            label.fontSize = 30
+            label.fontColor = SKColor.white
+            label.position = CGPoint(x: frame.midX, y: frame.maxY - CGFloat(100 + (index * 50)))
+            label.zPosition = 100
+            label.text = "\(achievement.name): \(achievement.progress)/\(achievement.target)"
+            addChild(label)
+            achievementsLabels.append(label)
         }
     }
     
     func setupBackButton() {
-        let backButton = SKLabelNode(fontNamed: "Helvetica")
-        backButton.text = "Back"
-        backButton.fontSize = 40
+        backButton = SKLabelNode(fontNamed: "Helvetica")
+        backButton.fontSize = 30
         backButton.fontColor = SKColor.white
-        backButton.position = CGPoint(x: frame.midX, y: frame.minY + 100)
-        backButton.name = "backButton"
+        backButton.position = CGPoint(x: frame.minX + 100, y: frame.maxY - 50)
+        backButton.zPosition = 100
+        backButton.text = "Back"
         addChild(backButton)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches {
-            let location = t.location(in: self)
-            let node = self.atPoint(location)
-            
-            if node.name == "backButton" {
-                let transition = SKTransition.fade(withDuration: 0.5)
-                if let gameScene = GameScene(fileNamed: "GameScene") {
-                    gameScene.scaleMode = .aspectFill
-                    view?.presentScene(gameScene, transition: transition)
-                }
-            }
+        guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
+        
+        if backButton.contains(location) {
+            goBackToGameScene()
+        }
+    }
+    
+    func goBackToGameScene() {
+        let transition = SKTransition.crossFade(withDuration: 1.0)
+        if let gameScene = GameScene(fileNamed: "GameScene") {
+            gameScene.scaleMode = .aspectFill
+            view?.presentScene(gameScene, transition: transition)
         }
     }
 }

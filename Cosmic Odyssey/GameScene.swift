@@ -2,7 +2,6 @@ import SpriteKit
 import GameplayKit
 
 class GameScene: SKScene {
-    
     var currentLevel: Int = 1
     var remainingCollectibles: Int = 1
     
@@ -15,8 +14,8 @@ class GameScene: SKScene {
     let lockTop = LockTop()
     let lockBase = LockBase()
     let labelBg = LabelBackground()
-    let player = Player()
-    var collectible = Collectible()
+    var player: Player!
+    var collectible: Collectible!
     
     let victory = SKLabelNode(text: "VICTORY ACHIEVED")
     
@@ -27,16 +26,18 @@ class GameScene: SKScene {
     let highScoreLabel = SKLabelNode(fontNamed: "Helvetica")
     let gameOverLabel = SKLabelNode(fontNamed: "Helvetica")
     let continueButton = SKLabelNode(fontNamed: "Helvetica")
+    let achievementsButton = SKLabelNode(fontNamed: "Helvetica")
     
     var isGameOver = false
     var collectibleTouched = false // Flag to track if collectible was touched
     
     override func didMove(to view: SKView) {
+        GameAchievements.loadAchievements()
         physicsWorld.contactDelegate = self
         
         lockBase.addChild(labelBg)
-        lockBase.addChild(player)
-        lockBase.addChild(collectible)
+        setupPlayer()
+        setupCollectible()
         
         addChild(lockTop)
         addChild(lockBase)
@@ -44,23 +45,30 @@ class GameScene: SKScene {
         setupLabels()
         setupGameOverScreen()
         setupAchievementsButton()
-        
-        GameAchievements.loadAchievements() // Load achievements
     }
-
+    
+    func setupPlayer() {
+        player = Player()
+        lockBase.addChild(player)
+    }
+    
+    func setupCollectible() {
+        collectible = Collectible()
+        lockBase.addChild(collectible)
+    }
     
     func setupLabels() {
         pointsLabel.fontSize = 40
-        pointsLabel.fontColor = SKColor.white // Set font color to white for visibility against black background
-        pointsLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 200) // Position at the top center of the screen
-        pointsLabel.zPosition = 100  // Ensure the label is on top of other nodes
+        pointsLabel.fontColor = SKColor.white
+        pointsLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 200)
+        pointsLabel.zPosition = 100
         pointsLabel.text = "Points: \(points)"
         addChild(pointsLabel)
         
         highScoreLabel.fontSize = 30
-        highScoreLabel.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1) // Set font color to #FEA3CF for high score
-        highScoreLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 250) // Position below the points label
-        highScoreLabel.zPosition = 100  // Ensure the label is on top of other nodes
+        highScoreLabel.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1)
+        highScoreLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 250)
+        highScoreLabel.zPosition = 100
         highScoreLabel.text = "High Score: \(highScore)"
         addChild(highScoreLabel)
         
@@ -77,7 +85,7 @@ class GameScene: SKScene {
         addChild(gameOverLabel)
         
         continueButton.fontSize = 50
-        continueButton.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1) // Set font color to #FEA3CF for continue button
+        continueButton.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1)
         continueButton.position = CGPoint(x: frame.midX, y: frame.maxY - 550)
         continueButton.zPosition = 100
         continueButton.text = "Continue"
@@ -85,6 +93,15 @@ class GameScene: SKScene {
         addChild(continueButton)
         
         print("Game Over screen and Continue button added to the scene")
+    }
+    
+    func setupAchievementsButton() {
+        achievementsButton.fontSize = 30
+        achievementsButton.fontColor = SKColor.white
+        achievementsButton.position = CGPoint(x: frame.midX, y: frame.minY + 100)
+        achievementsButton.zPosition = 100
+        achievementsButton.text = "Achievements"
+        addChild(achievementsButton)
     }
     
     func updatePoints() {
@@ -98,11 +115,8 @@ class GameScene: SKScene {
             UserDefaults.standard.set(highScore, forKey: "highScore")
             print("New high score: \(highScore)")
         }
-        
-        player.rotationSpeed += 0.01 // Increase player rotation speed slightly
-        print("Player rotation speed increased to: \(player.rotationSpeed)")
-        
-        GameAchievements.checkAchievements(points: points) // Check achievements
+
+        GameAchievements.checkAchievements(points: points, collectibles: points)
     }
     
     func spawnCollectible() {
@@ -110,6 +124,7 @@ class GameScene: SKScene {
         lockBase.addChild(newCollectible)
         collectible = newCollectible
         updatePoints()
+        GameAchievements.checkAchievements(points: points, collectibles: points)
     }
     
     func touchDown(atPoint pos : CGPoint) {
@@ -122,39 +137,57 @@ class GameScene: SKScene {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches {
-            let location = t.location(in: self)
-            let node = self.atPoint(location)
-            
-            if node.name == "achievementsButton" {
-                let transition = SKTransition.fade(withDuration: 0.5)
-                let achievementsScene = AchievementsScene(size: size)
-                achievementsScene.scaleMode = .aspectFill
-                view?.presentScene(achievementsScene, transition: transition)
-                return
-            }
-            
-            if isGameOver {
+        if isGameOver {
+            for t in touches {
+                let location = t.location(in: self)
                 if continueButton.contains(location) {
                     resetGame()
                 }
-            } else {
-                collectibleTouched = false // Reset the flag for each new touch
-                touchDown(atPoint: location)
-                
-                // If the collectible was not touched, end the game
-                if !collectibleTouched {
-                    gameOver()
-                }
+            }
+        } else {
+            collectibleTouched = false // Reset the flag for each new touch
+            for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+            
+            // If the collectible was not touched, end the game
+            if !collectibleTouched {
+                gameOver()
+            }
+        }
+        
+        for t in touches {
+            let location = t.location(in: self)
+            if achievementsButton.contains(location) {
+                goToAchievementsScene()
             }
         }
     }
-
     
     override func update(_ currentTime: TimeInterval) {
         if isGameOver { return }
         
-        player.zRotation += player.rotationSpeed * player.velocity
+        switch currentLevel {
+        case 1...4:
+            player.zRotation += 0.03 * player.velocity
+            
+        case 5...9:
+            player.zRotation += 0.04 * player.velocity
+            
+        case 10...14:
+            player.zRotation += 0.05 * player.velocity
+            
+        case 15...20:
+            player.zRotation += 0.06 * player.velocity
+            
+        default:
+            player.zRotation += 0.03 * player.velocity
+        }
+    }
+    
+    func goToAchievementsScene() {
+        let transition = SKTransition.crossFade(withDuration: 1.0)
+        let achievementsScene = AchievementsScene(size: self.size)
+        achievementsScene.scaleMode = .aspectFill
+        self.view?.presentScene(achievementsScene, transition: transition)
     }
 }
 
@@ -184,12 +217,9 @@ extension GameScene: SKPhysicsContactDelegate {
 
 extension GameScene {
     func clearPin() {
-        
         player.ready = false
         player.velocity *= -1
-        print("remBef: \(remainingCollectibles)")
         remainingCollectibles -= 1
-        print("rem: \(remainingCollectibles)")
         
         collectible.run(.sequence([
             .scale(to: 0, duration: 0.1),
@@ -215,27 +245,12 @@ extension GameScene {
         continueButton.isHidden = true
         player.isHidden = false
         
-        // Remove the old collectible if it exists
-        collectible.removeFromParent()
-        
         points = 0
         pointsLabel.text = "Points: \(points)"
         remainingCollectibles = 1
         player.velocity = 1
-        player.rotationSpeed = 0.03 // Reset player rotation speed to initial value
         player.ready = false
         
         spawnCollectible()
     }
-    
-    func setupAchievementsButton() {
-        let achievementsButton = SKLabelNode(fontNamed: "Helvetica")
-        achievementsButton.text = "Achievements"
-        achievementsButton.fontSize = 40
-        achievementsButton.fontColor = SKColor.white
-        achievementsButton.position = CGPoint(x: frame.midX, y: frame.maxY - 300)
-        achievementsButton.name = "achievementsButton"
-        addChild(achievementsButton)
-    }
-
 }

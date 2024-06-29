@@ -2,36 +2,40 @@ import Foundation
 
 struct Achievement {
     let name: String
-    let description: String
-    var isUnlocked: Bool
+    let target: Int
+    var progress: Int
+
+    var isCompleted: Bool {
+        return progress >= target
+    }
 }
 
 class GameAchievements {
     static var achievements: [Achievement] = [
-        Achievement(name: "First Collectible", description: "Collect your first collectible", isUnlocked: false),
-        Achievement(name: "Five Collectibles", description: "Collect five collectibles", isUnlocked: false),
-        Achievement(name: "High Scorer", description: "Reach a high score of 10", isUnlocked: false)
+        Achievement(name: "First 10 Points", target: 10, progress: 0),
+        Achievement(name: "Collector", target: 50, progress: 0),
+        Achievement(name: "High Scorer", target: 100, progress: 0)
     ]
-    
-    static func unlockAchievement(named name: String) {
-        if let index = achievements.firstIndex(where: { $0.name == name }) {
-            achievements[index].isUnlocked = true
-        }
-    }
-    
-    static func checkAchievements(points: Int) {
-        if points >= 1 {
-            unlockAchievement(named: "First Collectible")
-        }
-        if points >= 5 {
-            unlockAchievement(named: "Five Collectibles")
-        }
-        if points >= 10 {
-            unlockAchievement(named: "High Scorer")
-        }
-    }
-    
+
     static func loadAchievements() {
-        // Load achievements from persistent storage if needed
+        for (index, _) in achievements.enumerated() {
+            let progress = UserDefaults.standard.integer(forKey: "achievement_\(index)")
+            achievements[index].progress = progress
+        }
+    }
+
+    static func saveAchievements() {
+        for (index, achievement) in achievements.enumerated() {
+            UserDefaults.standard.set(achievement.progress, forKey: "achievement_\(index)")
+        }
+    }
+
+    static func checkAchievements(points: Int, collectibles: Int) {
+        achievements[0].progress = points
+        achievements[1].progress = collectibles
+        achievements[2].progress = max(points, collectibles)
+
+        saveAchievements()
     }
 }
+

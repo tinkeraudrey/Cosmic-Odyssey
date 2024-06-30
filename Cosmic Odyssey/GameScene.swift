@@ -4,6 +4,7 @@ import GameplayKit
 class GameScene: SKScene {
     
     var achievementsButton: SKLabelNode!
+    var leaderboardButton: SKLabelNode! // Add this line
     var achievements: [GameAchievement] = []
     
     var currentLevel: Int = 1
@@ -50,16 +51,27 @@ class GameScene: SKScene {
         setupLabels()
         setupGameOverScreen()
         setupAchievementsButton()
+        setupLeaderboardButton() // Add this line
     }
     
     func setupAchievementsButton() {
         achievementsButton = SKLabelNode(fontNamed: "Helvetica")
         achievementsButton.fontSize = 30
         achievementsButton.fontColor = SKColor.white
-        achievementsButton.position = CGPoint(x: frame.midX, y: frame.maxY - 300)
+        achievementsButton.position = CGPoint(x: frame.midX, y: frame.minY + 150)
         achievementsButton.zPosition = 100
         achievementsButton.text = "Achievements"
         addChild(achievementsButton)
+    }
+    
+    func setupLeaderboardButton() {
+        leaderboardButton = SKLabelNode(fontNamed: "Helvetica")
+        leaderboardButton.fontSize = 30
+        leaderboardButton.fontColor = SKColor.white
+        leaderboardButton.position = CGPoint(x: frame.midX, y: frame.minY + 100)
+        leaderboardButton.zPosition = 100
+        leaderboardButton.text = "Leaderboard"
+        addChild(leaderboardButton)
     }
 
     func setupLabels() {
@@ -151,12 +163,22 @@ class GameScene: SKScene {
         view?.window?.rootViewController?.present(achievementsViewController, animated: true, completion: nil)
     }
 
+    func showLeaderboard() {
+        let leaderboardViewController = LeaderboardViewController()
+        view?.window?.rootViewController?.present(leaderboardViewController, animated: true, completion: nil)
+    }
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let location = touch.location(in: self)
             
             if achievementsButton.contains(location) {
                 showAchievements()
+                return
+            }
+            
+            if leaderboardButton.contains(location) { // Add this block
+                showLeaderboard()
                 return
             }
             
@@ -195,12 +217,12 @@ class GameScene: SKScene {
     }
     
     func loadAchievements() -> [GameAchievement] {
-        if let savedAchievements = UserDefaults.standard.data(forKey: "achievements") {
-            if let decodedAchievements = try? JSONDecoder().decode([GameAchievement].self, from: savedAchievements) {
-                return decodedAchievements
-            }
+        if let savedAchievements = UserDefaults.standard.data(forKey: "achievements"),
+           let decodedAchievements = try? JSONDecoder().decode([GameAchievement].self, from: savedAchievements) {
+            return decodedAchievements
+        } else {
+            return setupAchievements()
         }
-        return setupAchievements()
     }
 
     override func update(_ currentTime: TimeInterval) {
@@ -267,4 +289,3 @@ extension GameScene {
         spawnCollectible()
     }
 }
-

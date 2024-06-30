@@ -18,21 +18,53 @@ class AchievementsViewController: UIViewController {
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .leading
-        stackView.spacing = 10
+        stackView.spacing = 20
         stackView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stackView)
 
         for achievement in achievements {
-            let achievementLabel = UILabel()
-            achievementLabel.numberOfLines = 0 // Allow multiple lines
-            achievementLabel.text = "\(achievement.title)\n\(achievement.description) - \(achievement.isUnlocked ? "Unlocked" : "Locked")"
-            achievementLabel.textColor = .white
-            stackView.addArrangedSubview(achievementLabel)
+            let achievementStackView = UIStackView()
+            achievementStackView.axis = .vertical
+            achievementStackView.alignment = .leading
+            achievementStackView.spacing = 5
 
-            // Create progress view
-            let progressView = UIProgressView(progressViewStyle: .default)
-            progressView.progress = Float(achievement.progress) / Float(achievement.goal)
-            stackView.addArrangedSubview(progressView)
+            let nameStackView = UIStackView()
+            nameStackView.axis = .horizontal
+            nameStackView.alignment = .center
+            nameStackView.spacing = 10
+
+            let nameLabel = UILabel()
+            nameLabel.numberOfLines = 0
+            nameLabel.text = "\(achievement.title): "
+            nameLabel.textColor = .white
+            nameStackView.addArrangedSubview(nameLabel)
+
+            let statusLabel = UILabel()
+            statusLabel.textColor = achievement.isUnlocked ? .green : .red
+            statusLabel.text = achievement.isUnlocked ? "Unlocked" : "Locked"
+            nameStackView.addArrangedSubview(statusLabel)
+
+            achievementStackView.addArrangedSubview(nameStackView)
+
+            let descriptionStackView = UIStackView()
+            descriptionStackView.axis = .horizontal
+            descriptionStackView.alignment = .center
+            descriptionStackView.spacing = 10
+
+            let progressLabel = UILabel()
+            progressLabel.textColor = .white
+            progressLabel.text = "\(achievement.progress)/\(achievement.goal)"
+            descriptionStackView.addArrangedSubview(progressLabel)
+
+            let descriptionLabel = UILabel()
+            descriptionLabel.numberOfLines = 0
+            descriptionLabel.text = "\(achievement.description)"
+            descriptionLabel.textColor = .white
+            descriptionStackView.addArrangedSubview(descriptionLabel)
+
+            achievementStackView.addArrangedSubview(descriptionStackView)
+
+            stackView.addArrangedSubview(achievementStackView)
         }
 
         NSLayoutConstraint.activate([

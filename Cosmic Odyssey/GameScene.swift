@@ -17,8 +17,6 @@ class GameAchievement {
     }
 }
 
-
-
 class GameScene: SKScene {
     
     var achievementsButton: SKLabelNode!
@@ -52,6 +50,7 @@ class GameScene: SKScene {
     var collectibleTouched = false // Flag to track if collectible was touched
     
     override func didMove(to view: SKView) {
+        
         
         physicsWorld.contactDelegate = self
         
@@ -189,12 +188,12 @@ class GameScene: SKScene {
         var achievements: [GameAchievement] = []
 
         // Example achievements
-        achievements.append(GameAchievement(title: "Novice Collector:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
-        achievements.append(GameAchievement(title: "Star Collector:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
-        achievements.append(GameAchievement(title: "Galactic Hoarder:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
-        achievements.append(GameAchievement(title: "Cosmic Gatherer:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
-        achievements.append(GameAchievement(title: "Interstellar Collector:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
-        achievements.append(GameAchievement(title: "Universal Archivist:", description: "10 Stellar Fragments", isUnlocked: points >= 30, progress: points, goal: 10))
+        achievements.append(GameAchievement(title: "Novice Collector", description: "Stellar Fragments collected", isUnlocked: points >= 10, progress: points, goal: 10))
+        achievements.append(GameAchievement(title: "Star Collector", description: "Stellar Fragments collected", isUnlocked: points >= 25, progress: points, goal: 25))
+        achievements.append(GameAchievement(title: "Galactic Hoarder", description: "Stellar Fragments collected", isUnlocked: points >= 50, progress: points, goal: 50))
+        achievements.append(GameAchievement(title: "Cosmic Gatherer", description: "Stellar Fragments collected", isUnlocked: points >= 75, progress: points, goal: 75))
+        achievements.append(GameAchievement(title: "Interstellar Collector", description: "Stellar Fragments collected", isUnlocked: points >= 100, progress: points, goal: 100))
+        achievements.append(GameAchievement(title: "Universal Archivist", description: "Stellar Fragments collected", isUnlocked: points >= 200, progress: points, goal: 200))
         
         return achievements
     }

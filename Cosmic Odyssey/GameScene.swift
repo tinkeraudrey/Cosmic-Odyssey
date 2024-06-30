@@ -1,25 +1,10 @@
 import SpriteKit
 import GameplayKit
 
-class GameAchievement {
-    var title: String
-    var description: String
-    var isUnlocked: Bool
-    var progress: Int
-    var goal: Int
-
-    init(title: String, description: String, isUnlocked: Bool, progress: Int, goal: Int) {
-        self.title = title
-        self.description = description
-        self.isUnlocked = isUnlocked
-        self.progress = progress
-        self.goal = goal
-    }
-}
-
 class GameScene: SKScene {
     
     var achievementsButton: SKLabelNode!
+    var achievements: [GameAchievement] = []
     
     var currentLevel: Int = 1
     var remainingCollectibles: Int = 1
@@ -40,6 +25,7 @@ class GameScene: SKScene {
     
     var points: Int = 0
     var highScore: Int = UserDefaults.standard.integer(forKey: "highScore")
+    var totalPoints: Int = UserDefaults.standard.integer(forKey: "totalPoints")
     
     let pointsLabel = SKLabelNode(fontNamed: "Helvetica")
     let highScoreLabel = SKLabelNode(fontNamed: "Helvetica")
@@ -50,7 +36,7 @@ class GameScene: SKScene {
     var collectibleTouched = false // Flag to track if collectible was touched
     
     override func didMove(to view: SKView) {
-        
+        achievements = loadAchievements() // Load saved achievements
         
         physicsWorld.contactDelegate = self
         
@@ -63,7 +49,7 @@ class GameScene: SKScene {
         
         setupLabels()
         setupGameOverScreen()
-        setupAchievementsButton()  // Add this line
+        setupAchievementsButton()
     }
     
     func setupAchievementsButton() {
@@ -78,16 +64,16 @@ class GameScene: SKScene {
 
     func setupLabels() {
         pointsLabel.fontSize = 40
-        pointsLabel.fontColor = SKColor.white // Set font color to white for visibility against black background
-        pointsLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 200) // Position at the top center of the screen
-        pointsLabel.zPosition = 100  // Ensure the label is on top of other nodes
+        pointsLabel.fontColor = SKColor.white
+        pointsLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 200)
+        pointsLabel.zPosition = 100
         pointsLabel.text = "Points: \(points)"
         addChild(pointsLabel)
         
         highScoreLabel.fontSize = 30
-        highScoreLabel.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1) // Set font color to #FEA3CF for high score
-        highScoreLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 250) // Position below the points label
-        highScoreLabel.zPosition = 100  // Ensure the label is on top of other nodes
+        highScoreLabel.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1)
+        highScoreLabel.position = CGPoint(x: frame.midX, y: frame.maxY - 250)
+        highScoreLabel.zPosition = 100
         highScoreLabel.text = "High Score: \(highScore)"
         addChild(highScoreLabel)
         
@@ -104,7 +90,7 @@ class GameScene: SKScene {
         addChild(gameOverLabel)
         
         continueButton.fontSize = 50
-        continueButton.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1) // Set font color to #FEA3CF for continue button
+        continueButton.fontColor = SKColor(red: 254/255, green: 163/255, blue: 207/255, alpha: 1)
         continueButton.position = CGPoint(x: frame.midX, y: frame.maxY - 550)
         continueButton.zPosition = 100
         continueButton.text = "Continue"
@@ -116,7 +102,9 @@ class GameScene: SKScene {
     
     func updatePoints() {
         points += 1
+        totalPoints += 1
         pointsLabel.text = "Points: \(points)"
+        UserDefaults.standard.set(totalPoints, forKey: "totalPoints")
         print("Points updated to: \(points)")
         
         if points > highScore {
@@ -126,13 +114,19 @@ class GameScene: SKScene {
             print("New high score: \(highScore)")
         }
         
-        player.rotationSpeed += 0.008 // Increase player rotation speed slightly
+        player.rotationSpeed += 0.008
         print("Player rotation speed increased to: \(player.rotationSpeed)")
         
         // Check for achievement unlock
-        if points == 10 {
-                print("Achievement Unlocked: Collector")
+        for achievement in achievements {
+            if !achievement.isUnlocked && totalPoints >= achievement.goal {
+                achievement.isUnlocked = true
+                print("Achievement Unlocked: \(achievement.title)")
             }
+            achievement.progress = totalPoints
+        }
+        
+        saveAchievements()
     }
     
     func spawnCollectible() {
@@ -144,16 +138,16 @@ class GameScene: SKScene {
     
     func touchDown(atPoint pos : CGPoint) {
         if player.ready {
-            collectibleTouched = true // Set the flag to true if the collectible was touched
+            collectibleTouched = true
             clearPin()
         } else {
-            collectibleTouched = false // Set the flag to false if the collectible was not touched
+            collectibleTouched = false
         }
     }
     
     func showAchievements() {
         let achievementsViewController = AchievementsViewController()
-        achievementsViewController.achievements = setupAchievements()  // Ensure you have achievements set up
+        achievementsViewController.achievements = achievements
         view?.window?.rootViewController?.present(achievementsViewController, animated: true, completion: nil)
     }
 
@@ -161,11 +155,9 @@ class GameScene: SKScene {
         for touch in touches {
             let location = touch.location(in: self)
             
-            // Check if the achievements button is touched
             if achievementsButton.contains(location) {
                 showAchievements()
-
-                return  // Exit the method early to avoid further processing
+                return
             }
             
             if isGameOver {
@@ -173,10 +165,9 @@ class GameScene: SKScene {
                     resetGame()
                 }
             } else {
-                collectibleTouched = false // Reset the flag for each new touch
+                collectibleTouched = false
                 touchDown(atPoint: location)
                 
-                // If the collectible was not touched, end the game
                 if !collectibleTouched {
                     gameOver()
                 }
@@ -187,21 +178,33 @@ class GameScene: SKScene {
     func setupAchievements() -> [GameAchievement] {
         var achievements: [GameAchievement] = []
 
-        // Example achievements
-        achievements.append(GameAchievement(title: "Novice Collector", description: "Stellar Fragments collected", isUnlocked: points >= 10, progress: points, goal: 10))
-        achievements.append(GameAchievement(title: "Star Collector", description: "Stellar Fragments collected", isUnlocked: points >= 25, progress: points, goal: 25))
-        achievements.append(GameAchievement(title: "Galactic Hoarder", description: "Stellar Fragments collected", isUnlocked: points >= 50, progress: points, goal: 50))
-        achievements.append(GameAchievement(title: "Cosmic Gatherer", description: "Stellar Fragments collected", isUnlocked: points >= 75, progress: points, goal: 75))
-        achievements.append(GameAchievement(title: "Interstellar Collector", description: "Stellar Fragments collected", isUnlocked: points >= 100, progress: points, goal: 100))
-        achievements.append(GameAchievement(title: "Universal Archivist", description: "Stellar Fragments collected", isUnlocked: points >= 200, progress: points, goal: 200))
+        achievements.append(GameAchievement(title: "Novice Collector", description: "Stellar Fragments collected", isUnlocked: totalPoints >= 10, progress: totalPoints, goal: 10))
+        achievements.append(GameAchievement(title: "Star Collector", description: "Stellar Fragments collected", isUnlocked: totalPoints >= 25, progress: totalPoints, goal: 25))
+        achievements.append(GameAchievement(title: "Galactic Hoarder", description: "Stellar Fragments collected", isUnlocked: totalPoints >= 50, progress: totalPoints, goal: 50))
+        achievements.append(GameAchievement(title: "Cosmic Gatherer", description: "Stellar Fragments collected", isUnlocked: totalPoints >= 75, progress: totalPoints, goal: 75))
+        achievements.append(GameAchievement(title: "Interstellar Collector", description: "Stellar Fragments collected", isUnlocked: totalPoints >= 100, progress: totalPoints, goal: 100))
+        achievements.append(GameAchievement(title: "Universal Archivist", description: "Stellar Fragments collected", isUnlocked: totalPoints >= 200, progress: totalPoints, goal: 200))
         
         return achievements
     }
 
+    func saveAchievements() {
+        if let encodedAchievements = try? JSONEncoder().encode(achievements) {
+            UserDefaults.standard.set(encodedAchievements, forKey: "achievements")
+        }
+    }
     
+    func loadAchievements() -> [GameAchievement] {
+        if let savedAchievements = UserDefaults.standard.data(forKey: "achievements") {
+            if let decodedAchievements = try? JSONDecoder().decode([GameAchievement].self, from: savedAchievements) {
+                return decodedAchievements
+            }
+        }
+        return setupAchievements()
+    }
+
     override func update(_ currentTime: TimeInterval) {
         if isGameOver { return }
-        
         player.zRotation += player.rotationSpeed * player.velocity
     }
 }
@@ -209,30 +212,22 @@ class GameScene: SKScene {
 extension GameScene: SKPhysicsContactDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         if isGameOver { return }
-        
         player.ready = true
-        
         startingTime = Date.now
     }
     
     func didEnd(_ contact: SKPhysicsContact) {
         if isGameOver { return }
-        
         lastEndContactTime = Date.now.timeIntervalSince(lastEndContact)
-        
         if lastEndContactTime < 1 { return }
-        
         player.ready = false
-        
         endingTime = Date.now
-        
         lastEndContact = Date.now
     }
 }
 
 extension GameScene {
     func clearPin() {
-        
         player.ready = false
         player.velocity *= -1
         print("remBef: \(remainingCollectibles)")
@@ -262,17 +257,14 @@ extension GameScene {
         gameOverLabel.isHidden = true
         continueButton.isHidden = true
         player.isHidden = false
-        
-        // Remove the old collectible if it exists
         collectible.removeFromParent()
-        
         points = 0
         pointsLabel.text = "Points: \(points)"
         remainingCollectibles = 1
         player.velocity = 1
-        player.rotationSpeed = 0.03 // Reset player rotation speed to initial value
+        player.rotationSpeed = 0.03
         player.ready = false
-        
         spawnCollectible()
     }
 }
+

@@ -21,6 +21,7 @@
 		5ED4B9D62C2E329D007D2051 /* unlock.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5ED4B9D52C2E329D007D2051 /* unlock.mp3 */; };
 		5ED4B9D82C2E3570007D2051 /* Lock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED4B9D72C2E3570007D2051 /* Lock.swift */; };
 		5ED4B9E42C30B02C007D2051 /* AchievementsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED4B9E32C30B02C007D2051 /* AchievementsViewController.swift */; };
+		5ED4B9E82C30F626007D2051 /* GameAchievement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED4B9E72C30F626007D2051 /* GameAchievement.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		5ED4B9D92C2EECD0007D2051 /* Cosmic-Odyssey-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Cosmic-Odyssey-Info.plist"; sourceTree = SOURCE_ROOT; };
 		5ED4B9DA2C2F87FB007D2051 /* Cosmic Odyssey.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Cosmic Odyssey.entitlements"; sourceTree = "<group>"; };
 		5ED4B9E32C30B02C007D2051 /* AchievementsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsViewController.swift; sourceTree = "<group>"; };
+		5ED4B9E72C30F626007D2051 /* GameAchievement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAchievement.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 				5ED4B9B42C2E2788007D2051 /* GameScene.sks */,
 				5ED4B9B82C2E2788007D2051 /* GameScene.swift */,
 				5ED4B9E32C30B02C007D2051 /* AchievementsViewController.swift */,
+				5ED4B9E72C30F626007D2051 /* GameAchievement.swift */,
 				5ED4B9D72C2E3570007D2051 /* Lock.swift */,
 				5ED4B9D32C2E3282007D2051 /* Collectible.swift */,
 				5ED4B9D12C2E3215007D2051 /* Player.swift */,
@@ -169,6 +172,7 @@
 			files = (
 				5ED4B9B92C2E2788007D2051 /* GameScene.swift in Sources */,
 				5ED4B9BB2C2E2788007D2051 /* GameViewController.swift in Sources */,
+				5ED4B9E82C30F626007D2051 /* GameAchievement.swift in Sources */,
 				5ED4B9CE2C2E2E69007D2051 /* Label.swift in Sources */,
 				5ED4B9D82C2E3570007D2051 /* Lock.swift in Sources */,
 				5ED4B9E42C30B02C007D2051 /* AchievementsViewController.swift in Sources */,
